@@ -8,10 +8,9 @@ import lombok.NoArgsConstructor
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 
-//@Data
-//@Builder
-//@NoArgsConstructor
-//@AllArgsConstructor
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 data class User(
     // inherits from UserDetails
