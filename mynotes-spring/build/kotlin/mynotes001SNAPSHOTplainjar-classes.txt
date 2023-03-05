@@ -1,0 +1,1 @@
+/hdd/Zadania/flutter/mynotes/mynotes-spring/build/classes/kotlin/main/com/example/mynotes/MynotesSpringApplication.class:/hdd/Zadania/flutter/mynotes/mynotes-spring/build/classes/kotlin/main/com/example/mynotes/MynotesSpringApplicationKt.class:/hdd/Zadania/flutter/mynotes/mynotes-spring/build/classes/kotlin/main/com/example/mynotes/security/User.class
