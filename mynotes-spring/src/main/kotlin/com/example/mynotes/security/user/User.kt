@@ -1,35 +1,28 @@
 package com.example.mynotes.security.user
 
 import jakarta.persistence.*
-import lombok.AllArgsConstructor
-import lombok.Builder
-import lombok.Data
-import lombok.NoArgsConstructor
+import org.springframework.security.config.core.GrantedAuthorityDefaults
 import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.core.authority.AuthorityUtils
 import org.springframework.security.core.userdetails.UserDetails
 
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
 data class User(
     // inherits from UserDetails
     private val username: String,
     private val password: String,
-    private val isEnabled: Boolean,
-    private val isCredentialsNonExpired: Boolean,
-    private val isAccountNonExpired: Boolean,
-    private val isAccountNonLocked: Boolean,
-    @ElementCollection
-    private val authorities: Set<GrantedAuthority>,
+    private val isEnabled: Boolean = true,
+    private val isCredentialsNonExpired: Boolean = true,
+    private val isAccountNonExpired: Boolean = true,
+    private val isAccountNonLocked: Boolean = true,
 
     // Custom attributes
-    @Id @GeneratedValue var id: Long,
+    @Id @GeneratedValue var id: Long = 0,
     var email: String,
     @Enumerated(EnumType.STRING) var role: Role
 ): UserDetails {
 
-    override fun getAuthorities(): Set<GrantedAuthority> = authorities
+    override fun getAuthorities(): Collection<GrantedAuthority> = AuthorityUtils.createAuthorityList("USER")
     override fun getPassword(): String = password
     override fun getUsername(): String = email
     override fun isAccountNonExpired(): Boolean = isAccountNonExpired

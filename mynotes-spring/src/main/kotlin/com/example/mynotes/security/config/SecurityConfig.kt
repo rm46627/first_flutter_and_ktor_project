@@ -1,6 +1,5 @@
 package com.example.mynotes.security.config
 
-import lombok.RequiredArgsConstructor
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -13,8 +12,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor
-class SecurityConfig @Autowired constructor(
+class SecurityConfig(
     private val jwtAuthenticationFilter: JwtAuthenticationFilter,
     private val authenticationProvider: AuthenticationProvider
 ){
@@ -24,7 +22,7 @@ class SecurityConfig @Autowired constructor(
         http
             .csrf().disable()
             .authorizeHttpRequests()
-            .requestMatchers("").permitAll()
+            .requestMatchers("/api/auth/**", "/swagger-ui.html").permitAll()
             .anyRequest().authenticated()
             .and()
             .sessionManagement()
