@@ -27,7 +27,7 @@ class AuthenticationService(
         return jwtService.generateToken(user)
     }
 
-    fun authenticate(request: AuthenticationRequest): AuthenticationResponse {
+    fun authenticate(request: AuthenticationRequest): String {
         authenticationManager.authenticate(
             UsernamePasswordAuthenticationToken(
                 request.email,
@@ -35,7 +35,6 @@ class AuthenticationService(
             )
         )
         val user = repository.findByEmail(request.email).orElseThrow()
-        val jwtToken = jwtService.generateToken(user)
-        return AuthenticationResponse(token = jwtToken)
+        return jwtService.generateToken(user)
     }
 }
