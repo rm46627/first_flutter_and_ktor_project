@@ -1,5 +1,6 @@
 package com.example.mynotes.security.auth
 
+import org.springframework.http.HttpEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -8,12 +9,17 @@ class AuthenticationController(
     private val service: AuthenticationService
 ){
     @PostMapping("/register")
-    fun register(@RequestBody request: RegisterRequest): AuthenticationResponse {
-        return AuthenticationResponse(service.register(request))
+    fun register(@RequestBody request: RegisterRequest): HttpEntity<String> {
+        return service.register(request)
     }
 
     @PostMapping("/authenticate")
-    fun register(@RequestBody request: AuthenticationRequest): AuthenticationResponse {
-        return AuthenticationResponse(service.authenticate(request))
+    fun activate(@RequestBody request: ActivationRequest): HttpEntity<String> {
+        return service.activateAccount(request)
+    }
+
+    @PostMapping("/authenticate")
+    fun authenticate(@RequestBody request: AuthenticationRequest): HttpEntity<String> {
+        return service.authenticate(request)
     }
 }

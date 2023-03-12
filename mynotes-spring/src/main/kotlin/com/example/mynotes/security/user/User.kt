@@ -11,7 +11,7 @@ data class User(
     // inherits from UserDetails
     private val username: String,
     private val password: String,
-    private val isEnabled: Boolean = true,
+    private var isEnabled: Boolean = false,
     private val isCredentialsNonExpired: Boolean = true,
     private val isAccountNonExpired: Boolean = true,
     private val isAccountNonLocked: Boolean = true,
@@ -19,6 +19,7 @@ data class User(
     // Custom attributes
     @Id @GeneratedValue var id: Long = 0,
     var email: String,
+    var code: String,
     @Enumerated(EnumType.STRING) var role: Role
 ): UserDetails {
 
@@ -29,4 +30,8 @@ data class User(
     override fun isAccountNonLocked(): Boolean = isAccountNonLocked
     override fun isCredentialsNonExpired(): Boolean = isCredentialsNonExpired
     override fun isEnabled(): Boolean = isEnabled
+
+    fun setEnabled() {
+        isEnabled = true
+    }
 }
