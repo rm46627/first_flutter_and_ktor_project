@@ -94,7 +94,10 @@ class _RegisterViewState extends State<RegisterView> {
                 onPressed: () {
                   registerUser();
                 },
-                child: const Text("Register"))
+                child: const Text("Register")),
+            const SizedBox(
+              height: 8,
+            ),
           ],
         ),
       ),
@@ -112,6 +115,7 @@ class _RegisterViewState extends State<RegisterView> {
     var response = await http.post(uri,
         headers: {"Content-Type": "application/json"}, body: body);
     changeHintText(response.statusCode);
+    print(response.statusCode);
     return response;
   }
 }

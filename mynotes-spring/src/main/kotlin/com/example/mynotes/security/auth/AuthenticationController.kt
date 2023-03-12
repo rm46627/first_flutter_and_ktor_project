@@ -13,7 +13,7 @@ class AuthenticationController(
         return service.register(request)
     }
 
-    @PostMapping("/authenticate")
+    @PostMapping("/activate")
     fun activate(@RequestBody request: ActivationRequest): HttpEntity<String> {
         return service.activateAccount(request)
     }

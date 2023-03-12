@@ -3,8 +3,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:mynotes/assets/constants.dart' as constants;
+import 'package:mynotes/views/registerView.dart';
 
 import '../secure_storage.dart' as auth;
+import 'homePage.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({Key? key}) : super(key: key);
@@ -84,25 +86,46 @@ class _LoginViewState extends State<LoginView> {
               height: 8,
             ),
             ElevatedButton(
-                onPressed: () {
-                  loginUser();
+                onPressed: () async {
+                  clickLoginBtn(context);
                 },
-                child: const Text("Login"))
+                child: const Text("Login")),
+            const SizedBox(
+              height: 8,
+            ),
+            ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const RegisterView()));
+                },
+                child: const Text("Register"))
           ],
         ),
       ),
     );
   }
 
+  void clickLoginBtn(BuildContext context) {
+    loginUser().then((value) => {
+          if (value.statusCode == 200)
+            {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const HomePage()))
+            }
+        });
+  }
+
   Future<http.Response> loginUser() async {
-    Map data = {'username': _username.text, 'password': _password.text};
+    Map data = {'email': _username.text, 'password': _password.text};
     var uri = Uri.parse(constants.API_LOGIN_URL);
     var body = json.encode(data);
     var response = await http.post(uri,
         headers: {"Content-Type": "application/json"}, body: body);
     changeHintText(response.statusCode);
     auth.saveAuthToken(response.body);
-    print(auth.getAuthToken());
+    print(response.statusCode);
     return response;
   }
 }
