@@ -28,7 +28,8 @@ class _RegisterViewState extends State<RegisterView> {
           _hintTextHolder = "Registration data must not be blank!";
           break;
         case 200:
-          _hintTextHolder = "Registered successfully!";
+          _hintTextHolder =
+              "Registered successfully! \nCheck your email for activation code.";
           break;
         default:
           _hintTextHolder = "Fill all the information's.";

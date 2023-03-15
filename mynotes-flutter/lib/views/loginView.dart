@@ -18,12 +18,17 @@ class LoginView extends StatefulWidget {
 class _LoginViewState extends State<LoginView> {
   late final TextEditingController _username;
   late final TextEditingController _password;
+  late final TextEditingController _code;
 
   String _hintTextHolder = "Fill all the information's.";
+  String _hintAlert = 'Activate your account';
 
   changeHintText(int status) {
     setState(() {
       switch (status) {
+        case 422:
+          _hintTextHolder = "Need to activate your account first!";
+          break;
         case 409:
           _hintTextHolder = "Wrong username or password!";
           break;
@@ -39,10 +44,17 @@ class _LoginViewState extends State<LoginView> {
     });
   }
 
+  changeAlertText(String text) {
+    setState(() {
+      _hintAlert = text;
+    });
+  }
+
   @override
   void initState() {
     _username = TextEditingController();
     _password = TextEditingController();
+    _code = TextEditingController();
     super.initState();
   }
 
@@ -50,6 +62,7 @@ class _LoginViewState extends State<LoginView> {
   void dispose() {
     _username.dispose();
     _password.dispose();
+    _code.dispose();
     super.dispose();
   }
 
@@ -114,12 +127,75 @@ class _LoginViewState extends State<LoginView> {
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => const HomePage()))
             }
+          else if (value.statusCode == 422)
+            showCodeDialog(context)
         });
+  }
+
+  Future<dynamic> showCodeDialog(BuildContext context) {
+    return showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: const Text("Activate your account"),
+              content: TextField(
+                controller: _code,
+                decoration: const InputDecoration(
+                    hintText: 'Enter special code from email message'),
+              ),
+              actions: [
+                ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Text('Back')),
+                ElevatedButton(
+                    onPressed: () {
+                      activateUser().then((value) => {
+                            if (value.statusCode == 200)
+                              {
+                                Navigator.pushAndRemoveUntil(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => const HomePage()),
+                                    (r) => false)
+                              }
+                            else
+                              {
+                                showDialog(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                          title: const Text("Wrong code"),
+                                          actions: [
+                                            ElevatedButton(
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                },
+                                                child: const Text("Back"))
+                                          ],
+                                        ))
+                              }
+                          });
+                    },
+                    child: const Text('Check'))
+              ],
+            ));
   }
 
   Future<http.Response> loginUser() async {
     Map data = {'email': _username.text, 'password': _password.text};
     var uri = Uri.parse(constants.API_LOGIN_URL);
+    var body = json.encode(data);
+    var response = await http.post(uri,
+        headers: {"Content-Type": "application/json"}, body: body);
+    changeHintText(response.statusCode);
+    auth.saveAuthToken(response.body);
+    print(response.statusCode);
+    return response;
+  }
+
+  Future<http.Response> activateUser() async {
+    Map data = {'email': _username.text, 'password': _password.text};
+    var uri = Uri.parse(constants.API_ACTIVATE_URL + _code.text);
     var body = json.encode(data);
     var response = await http.post(uri,
         headers: {"Content-Type": "application/json"}, body: body);

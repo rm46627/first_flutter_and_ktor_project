@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:mynotes/assets/constants.dart' as constants;
+import 'package:mynotes/secure_storage.dart';
+import 'package:mynotes/views/loginView.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -16,7 +18,18 @@ class HomePage extends StatelessWidget {
         body: Padding(
           padding: const EdgeInsets.all(8),
           child: Column(
-            children: [Text('JESTES')],
+            children: [
+              ElevatedButton(
+                  onPressed: () {
+                    deleteAuthToken();
+                    Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const LoginView()),
+                        (r) => false);
+                  },
+                  child: const Text('Logout'))
+            ],
           ),
         ));
   }
