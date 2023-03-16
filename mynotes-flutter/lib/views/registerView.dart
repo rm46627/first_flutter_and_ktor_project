@@ -16,6 +16,8 @@ class _RegisterViewState extends State<RegisterView> {
   late final TextEditingController _email;
   late final TextEditingController _password;
 
+  var isLoading = false;
+
   String _hintTextHolder = "Fill all the information's.";
 
   changeHintText(int status) {
@@ -91,11 +93,9 @@ class _RegisterViewState extends State<RegisterView> {
             const SizedBox(
               height: 8,
             ),
-            ElevatedButton(
-                onPressed: () {
-                  registerUser();
-                },
-                child: const Text("Register")),
+            Builder(builder: (context) {
+              return buildRegisterButton();
+            }),
             const SizedBox(
               height: 8,
             ),
@@ -105,7 +105,37 @@ class _RegisterViewState extends State<RegisterView> {
     );
   }
 
+  SizedBox buildRegisterButton() {
+    return SizedBox(
+      height: 35.0,
+      width: 100.0,
+      child: ElevatedButton(
+        onPressed: () {
+          FutureBuilder(
+              future: registerUser(),
+              builder: (BuildContext context, AsyncSnapshot snapshot) {
+                if (snapshot.connectionState != ConnectionState.done) {
+                  return const CircularProgressIndicator(
+                      backgroundColor: Colors.blue);
+                }
+                return Container();
+              });
+        },
+        child: isLoading
+            ? const SizedBox(
+                height: 25.0,
+                width: 25.0,
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                ),
+              )
+            : const Text("Register"),
+      ),
+    );
+  }
+
   Future<http.Response> registerUser() async {
+    setState(() => isLoading = true);
     Map data = {
       'username': _username.text,
       'email': _email.text,
@@ -117,6 +147,7 @@ class _RegisterViewState extends State<RegisterView> {
         headers: {"Content-Type": "application/json"}, body: body);
     changeHintText(response.statusCode);
     print(response.statusCode);
+    setState(() => isLoading = false);
     return response;
   }
 }

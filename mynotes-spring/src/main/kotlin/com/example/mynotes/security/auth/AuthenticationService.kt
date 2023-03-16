@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.authentication.DisabledException
-import org.springframework.security.authentication.LockedException
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
@@ -37,7 +36,7 @@ class AuthenticationService(
         }
 
         val encoded = passwordEncoder.encode(request.password)
-        val activationCode = encoded.subSequence(0,5) as String
+        val activationCode = encoded.filter { it.isDigit() }.substring(3,8)
         val user = User(
             username = request.username,
             email = request.email,
@@ -56,14 +55,17 @@ class AuthenticationService(
         return AuthenticationResponse(jwtService.generateToken(user))
     }
 
-    fun activateAccount(request: ActivationRequest) : HttpEntity<String> {
+    fun activateAccount(request: AuthenticationRequest, code: String) : HttpEntity<String> {
         val user = repository.findByEmail(request.email).orElseThrow()
-        if(user.code == request.code) {
+        print(code)
+        print(user.toString())
+        if(user.code == code) {
             user.setEnabled()
+            repository.save(user)
         } else {
             return ResponseEntity(HttpStatusCode.valueOf(401))
         }
-        return AuthenticationResponse(jwtService.generateToken(user))
+        return authenticate(request)
     }
 
     fun authenticate(request: AuthenticationRequest): HttpEntity<String> {
@@ -80,10 +82,6 @@ class AuthenticationService(
             return ResponseEntity(HttpStatusCode.valueOf(422))
         }
         val user = repository.findByEmail(request.email).orElseThrow()
-        // doing manual isEnabled check because authManager doesnt
-        if(!user.isEnabled) {
-            return ResponseEntity(HttpStatusCode.valueOf(422))
-        }
         return AuthenticationResponse(jwtService.generateToken(user))
     }
 }

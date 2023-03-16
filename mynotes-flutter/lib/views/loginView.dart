@@ -6,7 +6,7 @@ import 'package:mynotes/assets/constants.dart' as constants;
 import 'package:mynotes/views/registerView.dart';
 
 import '../secure_storage.dart' as auth;
-import 'homePage.dart';
+import 'notesPage.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({Key? key}) : super(key: key);
@@ -84,8 +84,8 @@ class _LoginViewState extends State<LoginView> {
             ),
             TextField(
               controller: _username,
-              decoration: const InputDecoration(
-                  hintText: 'Enter your username or email'),
+              decoration:
+                  const InputDecoration(hintText: 'Enter your username'),
             ),
             TextField(
               controller: _password,
@@ -125,7 +125,7 @@ class _LoginViewState extends State<LoginView> {
           if (value.statusCode == 200)
             {
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const HomePage()))
+                  MaterialPageRoute(builder: (context) => const NotesPage()))
             }
           else if (value.statusCode == 422)
             showCodeDialog(context)
@@ -134,8 +134,12 @@ class _LoginViewState extends State<LoginView> {
 
   Future<dynamic> showCodeDialog(BuildContext context) {
     return showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
+      context: context,
+      builder: (context) => ScaffoldMessenger(
+        child: Builder(builder: (context) {
+          return Scaffold(
+            backgroundColor: Colors.transparent,
+            body: AlertDialog(
               title: const Text("Activate your account"),
               content: TextField(
                 controller: _code,
@@ -153,32 +157,25 @@ class _LoginViewState extends State<LoginView> {
                       activateUser().then((value) => {
                             if (value.statusCode == 200)
                               {
-                                Navigator.pushAndRemoveUntil(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => const HomePage()),
-                                    (r) => false)
+                                Navigator.of(context).pushNamedAndRemoveUntil(
+                                    '/notes', (route) => false)
                               }
                             else
                               {
-                                showDialog(
-                                    context: context,
-                                    builder: (context) => AlertDialog(
-                                          title: const Text("Wrong code"),
-                                          actions: [
-                                            ElevatedButton(
-                                                onPressed: () {
-                                                  Navigator.pop(context);
-                                                },
-                                                child: const Text("Back"))
-                                          ],
-                                        ))
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                        backgroundColor: Colors.red,
+                                        content: Text("Wrong code")))
                               }
                           });
                     },
                     child: const Text('Check'))
               ],
-            ));
+            ),
+          );
+        }),
+      ),
+    );
   }
 
   Future<http.Response> loginUser() async {

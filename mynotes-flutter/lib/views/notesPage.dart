@@ -6,8 +6,8 @@ import 'package:mynotes/assets/constants.dart' as constants;
 import 'package:mynotes/secure_storage.dart';
 import 'package:mynotes/views/loginView.dart';
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+class NotesPage extends StatelessWidget {
+  const NotesPage({super.key});
 
   @override
   Widget build(BuildContext context) {
