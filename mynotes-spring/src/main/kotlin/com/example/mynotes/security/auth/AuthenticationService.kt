@@ -25,54 +25,63 @@ class AuthenticationService(
     private val mailService: MailService
 ) {
     fun register(request: RegisterRequest): HttpEntity<String> {
-        val conflict = repository.findByUsernameOrEmail(request.username, request.email)
-        if(conflict != null) {
-            return ResponseEntity(HttpStatusCode.valueOf(409))
-        } else {
-            val encoded = passwordEncoder.encode(request.password)
-            val activationCode = encoded.filter { it.isDigit() }.substring(3, 8)
-            val user = User(
-                username = request.username,
-                email = request.email,
-                password = passwordEncoder.encode(request.password),
-                code = activationCode,
-                role = Role.USER
-            )
-            repository.save(user)
-            mailService.sendMail(
-                Message(
-                    user.email,
-                    "Mynotes Activation Email",
-                    "Your activation code: $activationCode"
-                )
-            )
-            return AuthenticationResponse(jwtService.generateToken(user))
+        val validate = request.email.isBlank() || request.username.isBlank() || request.password.isBlank()
+        if(validate) {
+            return ResponseEntity(HttpStatusCode.valueOf(403))
         }
+        val conflict =
+            repository.findByEmail(request.email).isPresent || repository.findByUsername(request.username).isPresent
+        if (conflict) {
+            return ResponseEntity(HttpStatusCode.valueOf(409))
+        }
+
+        val encoded = passwordEncoder.encode(request.password)
+        val activationCode = encoded.filter { it.isDigit() }.substring(3,8)
+        val user = User(
+            username = request.username,
+            email = request.email,
+            password = passwordEncoder.encode(request.password),
+            code = activationCode,
+            role = Role.USER
+        )
+        repository.save(user)
+        mailService.sendMail(
+            Message(
+                user.email,
+                "Mynotes Activation Email",
+                "Your activation code: $activationCode"
+            )
+        )
+        return AuthenticationResponse(jwtService.generateToken(user))
     }
 
     fun activateAccount(request: AuthenticationRequest, code: String) : HttpEntity<String> {
-        val user = repository.findByUsernameOrEmail(request.usernameOrEmail) ?: throw NoSuchElementException()
+        val user = repository.findByEmail(request.email).orElseThrow()
+        print(code)
+        print(user.toString())
         if(user.code == code) {
             user.setEnabled()
             repository.save(user)
         } else {
-            return ResponseEntity(HttpStatusCode.valueOf(403))
+            return ResponseEntity(HttpStatusCode.valueOf(401))
         }
         return authenticate(request)
     }
 
     fun authenticate(request: AuthenticationRequest): HttpEntity<String> {
-        return try {
+        try {
             authenticationManager.authenticate(
                 UsernamePasswordAuthenticationToken(
-                    request.usernameOrEmail,
+                    request.email,
                     request.password
                 )
             )
-            val user = repository.findByUsernameOrEmail(request.usernameOrEmail)!!
-            AuthenticationResponse(jwtService.generateToken(user))
+        } catch (e: BadCredentialsException) {
+            return ResponseEntity(HttpStatusCode.valueOf(401))
         } catch (e: DisabledException) {
-            ResponseEntity(HttpStatusCode.valueOf(419))
+            return ResponseEntity(HttpStatusCode.valueOf(422))
         }
+        val user = repository.findByEmail(request.email).orElseThrow()
+        return AuthenticationResponse(jwtService.generateToken(user))
     }
 }

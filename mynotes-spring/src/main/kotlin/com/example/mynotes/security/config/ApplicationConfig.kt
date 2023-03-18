@@ -21,7 +21,9 @@ class ApplicationConfig(
     @Bean
     fun userDetailsService(): UserDetailsService {
         return UserDetailsService { username ->
-            userRepository.findByUsernameOrEmail(username, username) ?: throw NoSuchElementException()
+            userRepository.findByUsername(username).orElseThrow {
+                UsernameNotFoundException("$username not found")
+            }
         }
     }
 

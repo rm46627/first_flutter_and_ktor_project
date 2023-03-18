@@ -3,8 +3,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:mynotes/assets/constants.dart' as constants;
+import 'package:mynotes/views/registerView.dart';
 
 import '../secure_storage.dart' as auth;
+import 'notesPage.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({Key? key}) : super(key: key);
@@ -24,11 +26,14 @@ class _LoginViewState extends State<LoginView> {
   changeHintText(int status) {
     setState(() {
       switch (status) {
-        case 419:
+        case 422:
           _hintTextHolder = "Need to activate your account first!";
           break;
-        case 403:
+        case 409:
           _hintTextHolder = "Wrong username or password!";
+          break;
+        case 403:
+          _hintTextHolder = "Login data must not be blank!";
           break;
         case 200:
           _hintTextHolder = "Logged in successfully!";
@@ -79,8 +84,8 @@ class _LoginViewState extends State<LoginView> {
             ),
             TextField(
               controller: _username,
-              decoration: const InputDecoration(
-                  hintText: 'Enter your username or email'),
+              decoration:
+                  const InputDecoration(hintText: 'Enter your username'),
             ),
             TextField(
               controller: _password,
@@ -91,7 +96,7 @@ class _LoginViewState extends State<LoginView> {
                   const InputDecoration(hintText: 'Enter your password'),
             ),
             const SizedBox(
-              height: 16,
+              height: 8,
             ),
             ElevatedButton(
                 onPressed: () async {
@@ -99,16 +104,16 @@ class _LoginViewState extends State<LoginView> {
                 },
                 child: const Text("Login")),
             const SizedBox(
-              height: 16,
+              height: 8,
             ),
-            TextButton(
+            ElevatedButton(
                 onPressed: () {
-                  Navigator.of(context).pushNamed('/register');
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const RegisterView()));
                 },
-                child: const Text(
-                  "Sign up here!",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ))
+                child: const Text("Register"))
           ],
         ),
       ),
@@ -119,10 +124,10 @@ class _LoginViewState extends State<LoginView> {
     loginUser().then((value) => {
           if (value.statusCode == 200)
             {
-              Navigator.of(context)
-                  .pushNamedAndRemoveUntil('/notes', (route) => false)
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const NotesPage()))
             }
-          else if (value.statusCode == 419)
+          else if (value.statusCode == 422)
             showCodeDialog(context)
         });
   }
@@ -174,7 +179,7 @@ class _LoginViewState extends State<LoginView> {
   }
 
   Future<http.Response> loginUser() async {
-    Map data = {'usernameOrEmail': _username.text, 'password': _password.text};
+    Map data = {'email': _username.text, 'password': _password.text};
     var uri = Uri.parse(constants.API_LOGIN_URL);
     var body = json.encode(data);
     var response = await http.post(uri,
@@ -186,7 +191,7 @@ class _LoginViewState extends State<LoginView> {
   }
 
   Future<http.Response> activateUser() async {
-    Map data = {'usernameOrEmail': _username.text, 'password': _password.text};
+    Map data = {'email': _username.text, 'password': _password.text};
     var uri = Uri.parse(constants.API_ACTIVATE_URL + _code.text);
     var body = json.encode(data);
     var response = await http.post(uri,
