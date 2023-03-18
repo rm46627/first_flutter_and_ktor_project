@@ -68,6 +68,7 @@ class _RegisterViewState extends State<RegisterView> {
             ),
             Text(
               _hintTextHolder,
+              textAlign: TextAlign.center,
               style: const TextStyle(
                   fontWeight: FontWeight.bold, color: Colors.blueGrey),
             ),

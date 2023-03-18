@@ -14,6 +14,23 @@ class NotesPage extends StatelessWidget {
     return Scaffold(
         appBar: AppBar(
           title: const Text("Home"),
+          actions: [
+            PopupMenuButton(
+              itemBuilder: (context) {
+                return [const PopupMenuItem(value: 0, child: Text("Logout"))];
+              },
+              onSelected: (value) {
+                if (value == 0) {
+                  deleteAuthToken();
+                  Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const LoginView()),
+                      (r) => false);
+                }
+              },
+            )
+          ],
         ),
         body: Padding(
           padding: const EdgeInsets.all(8),
