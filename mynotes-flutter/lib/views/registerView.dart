@@ -60,17 +60,16 @@ class _RegisterViewState extends State<RegisterView> {
     return Scaffold(
       appBar: AppBar(title: const Text('Register')),
       body: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             const SizedBox(
-              height: 8,
+              height: 16,
             ),
             Text(
               _hintTextHolder,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                  fontWeight: FontWeight.bold, color: Colors.blueGrey),
+              style: const TextStyle(color: Colors.blueGrey),
             ),
             TextField(
               controller: _username,
@@ -92,14 +91,11 @@ class _RegisterViewState extends State<RegisterView> {
                   const InputDecoration(hintText: 'Enter your password'),
             ),
             const SizedBox(
-              height: 8,
+              height: 16,
             ),
             Builder(builder: (context) {
               return buildRegisterButton();
             }),
-            const SizedBox(
-              height: 8,
-            ),
           ],
         ),
       ),

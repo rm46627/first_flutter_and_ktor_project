@@ -66,16 +66,15 @@ class _LoginViewState extends State<LoginView> {
     return Scaffold(
       appBar: AppBar(title: const Text('Login')),
       body: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             const SizedBox(
-              height: 8,
+              height: 16,
             ),
             Text(
               _hintTextHolder,
-              style: const TextStyle(
-                  fontWeight: FontWeight.bold, color: Colors.blueGrey),
+              style: const TextStyle(color: Colors.blueGrey),
             ),
             TextField(
               controller: _username,
@@ -93,11 +92,15 @@ class _LoginViewState extends State<LoginView> {
             const SizedBox(
               height: 16,
             ),
-            ElevatedButton(
-                onPressed: () async {
-                  clickLoginBtn(context);
-                },
-                child: const Text("Login")),
+            SizedBox(
+              height: 35.0,
+              width: 75.0,
+              child: ElevatedButton(
+                  onPressed: () async {
+                    clickLoginBtn(context);
+                  },
+                  child: const Text("Login")),
+            ),
             const SizedBox(
               height: 16,
             ),
