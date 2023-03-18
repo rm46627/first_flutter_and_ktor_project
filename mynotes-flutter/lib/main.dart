@@ -25,23 +25,23 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<String?>(
-      future: getAuthToken(),
-      builder: (BuildContext context, AsyncSnapshot<String?> tokenSnapshot) {
-        if (tokenSnapshot.connectionState != ConnectionState.done) {
-          return const Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(),
-            ),
-          );
-        } else {
-          final token = tokenSnapshot.data;
-          if (token == null) {
-            return const LoginView();
-          } else {
-            return const HomePage();
+        future: getAuthToken(),
+        builder: (context, tokenSnapshot) {
+          switch (tokenSnapshot.connectionState) {
+            case ConnectionState.done:
+              final token = tokenSnapshot.data;
+              if (token == null) {
+                return const LoginView();
+              } else {
+                return const NotesPage();
+              }
+            default:
+              return const Scaffold(
+                body: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              );
           }
-        }
-      },
-    );
+        });
   }
 }
