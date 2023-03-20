@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:mynotes/assets/constants.dart' as constants;
 import 'package:mynotes/secure_storage.dart';
-import 'package:mynotes/views/loginView.dart';
 
 class NotesPage extends StatelessWidget {
   const NotesPage({super.key});
@@ -13,7 +12,7 @@ class NotesPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text("Home"),
+          title: const Text("Notes"),
           actions: [
             PopupMenuButton(
               itemBuilder: (context) {
@@ -22,11 +21,8 @@ class NotesPage extends StatelessWidget {
               onSelected: (value) {
                 if (value == 0) {
                   deleteAuthToken();
-                  Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const LoginView()),
-                      (r) => false);
+                  Navigator.of(context)
+                      .pushNamedAndRemoveUntil('/login', (route) => false);
                 }
               },
             )
@@ -35,18 +31,7 @@ class NotesPage extends StatelessWidget {
         body: Padding(
           padding: const EdgeInsets.all(8),
           child: Column(
-            children: [
-              ElevatedButton(
-                  onPressed: () {
-                    deleteAuthToken();
-                    Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const LoginView()),
-                        (r) => false);
-                  },
-                  child: const Text('Logout'))
-            ],
+            children: [],
           ),
         ));
   }
