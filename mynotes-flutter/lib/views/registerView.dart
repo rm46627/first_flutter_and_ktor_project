@@ -1,8 +1,7 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:mynotes/assets/constants.dart' as constants;
+
+import '../services/auth/authService.dart';
 
 class RegisterView extends StatefulWidget {
   const RegisterView({Key? key}) : super(key: key);
@@ -73,8 +72,7 @@ class _RegisterViewState extends State<RegisterView> {
             ),
             TextField(
               controller: _username,
-              decoration:
-                  const InputDecoration(hintText: 'Enter your username'),
+              decoration: const InputDecoration(hintText: 'Enter your username'),
             ),
             TextField(
               controller: _email,
@@ -87,8 +85,7 @@ class _RegisterViewState extends State<RegisterView> {
               obscureText: true,
               enableSuggestions: false,
               autocorrect: false,
-              decoration:
-                  const InputDecoration(hintText: 'Enter your password'),
+              decoration: const InputDecoration(hintText: 'Enter your password'),
             ),
             const SizedBox(
               height: 16,
@@ -112,8 +109,7 @@ class _RegisterViewState extends State<RegisterView> {
               future: registerUser(),
               builder: (BuildContext context, AsyncSnapshot snapshot) {
                 if (snapshot.connectionState != ConnectionState.done) {
-                  return const CircularProgressIndicator(
-                      backgroundColor: Colors.blue);
+                  return const CircularProgressIndicator(backgroundColor: Colors.blue);
                 }
                 return Container();
               });
@@ -133,17 +129,9 @@ class _RegisterViewState extends State<RegisterView> {
 
   Future<http.Response> registerUser() async {
     setState(() => isLoading = true);
-    Map data = {
-      'username': _username.text,
-      'email': _email.text,
-      'password': _password.text
-    };
-    var uri = Uri.parse(constants.API_REGISTER_URL);
-    var body = json.encode(data);
-    var response = await http.post(uri,
-        headers: {"Content-Type": "application/json"}, body: body);
+    http.Response response = await AuthService.rest().createUser(
+        username: _username.text, email: _email.text, password: _password.text);
     changeHintText(response.statusCode);
-    print(response.statusCode);
     setState(() => isLoading = false);
     return response;
   }

@@ -1,20 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:mynotes/secure_storage.dart';
+import 'package:mynotes/assets/constants.dart';
+import 'package:mynotes/services/auth/authService.dart';
 import 'package:mynotes/views/loginView.dart';
-import 'package:mynotes/views/notesPage.dart';
+import 'package:mynotes/views/notesView.dart';
 import 'package:mynotes/views/registerView.dart';
 
 void main() {
   runApp(MaterialApp(
+    // debugShowCheckedModeBanner: false,
     title: 'MyNotesFlutter',
     theme: ThemeData(
       primarySwatch: Colors.blueGrey,
     ),
     home: const HomePage(),
     routes: {
-      '/login': (context) => const LoginView(),
-      '/register': (context) => const RegisterView(),
-      '/notes': (context) => const NotesPage()
+      loginRoute: (context) => const LoginView(),
+      registerRoute: (context) => const RegisterView(),
+      notesRoute: (context) => const NotesView()
     },
   ));
 }
@@ -25,7 +27,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<String?>(
-      future: getAuthToken(),
+      future: AuthService.rest().getCurrentUserToken(),
       builder: (BuildContext context, AsyncSnapshot<String?> tokenSnapshot) {
         if (tokenSnapshot.connectionState != ConnectionState.done) {
           return const Scaffold(
@@ -38,7 +40,7 @@ class HomePage extends StatelessWidget {
           if (token == null) {
             return const LoginView();
           } else {
-            return const HomePage();
+            return const NotesView();
           }
         }
       },

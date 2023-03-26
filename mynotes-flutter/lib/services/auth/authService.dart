@@ -1,18 +1,36 @@
-class AuthService {
-  String _token;
+import 'package:http/http.dart' as http;
+import 'package:mynotes/services/auth/authProvider.dart';
+import 'package:mynotes/services/auth/restAuthProvider.dart';
 
-  Future<void> saveAuthToken(String token) async {
-    final storage = FlutterSecureStorage();
-    await storage.write(key: 'auth_token', value: token);
-  }
+class AuthService implements AuthProvider {
+  final AuthProvider _provider;
+  const AuthService(this._provider);
 
-  Future<String?> getAuthToken() async {
-    final storage = FlutterSecureStorage();
-    return storage.read(key: 'auth_token');
-  }
+  factory AuthService.rest() => AuthService(RestAuthProvider());
 
-  Future<void> deleteAuthToken() async {
-    final storage = FlutterSecureStorage();
-    return storage.delete(key: 'auth_token');
-  }
+  @override
+  Future<http.Response> activate(
+          {required String usernameOrEmail,
+          required String password,
+          required String code}) =>
+      _provider.activate(
+          usernameOrEmail: usernameOrEmail, password: password, code: code);
+
+  @override
+  Future<http.Response> createUser(
+          {required String username, required String email, required String password}) =>
+      _provider.createUser(username: username, email: email, password: password);
+
+  @override
+  Future<void> initialize() => _provider.initialize();
+
+  @override
+  Future<http.Response> logIn({required String username, required String password}) =>
+      _provider.logIn(username: username, password: password);
+
+  @override
+  Future<void> logOut() => _provider.logOut();
+
+  @override
+  Future<String?> getCurrentUserToken() => _provider.getCurrentUserToken();
 }

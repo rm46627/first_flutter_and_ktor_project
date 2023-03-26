@@ -4,4 +4,4 @@ import org.springframework.http.HttpEntity
 
 data class AuthenticationResponse(
     val token: String
-) : HttpEntity<String>()
+) : HttpEntity<String>(token)

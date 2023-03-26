@@ -1,12 +1,10 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:mynotes/assets/constants.dart' as constants;
-import 'package:mynotes/secure_storage.dart';
+import 'package:mynotes/services/auth/authService.dart';
 
-class NotesPage extends StatelessWidget {
-  const NotesPage({super.key});
+import '../assets/constants.dart';
+
+class NotesView extends StatelessWidget {
+  const NotesView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -15,17 +13,14 @@ class NotesPage extends StatelessWidget {
           title: const Text("Notes"),
           actions: [
             PopupMenuButton(
-              itemBuilder: (context) {
-                return [const PopupMenuItem(value: 0, child: Text("Logout"))];
-              },
-              onSelected: (value) {
-                if (value == 0) {
-                  deleteAuthToken();
-                  Navigator.of(context)
-                      .pushNamedAndRemoveUntil('/login', (route) => false);
-                }
-              },
-            )
+                itemBuilder: (context) => [
+                      PopupMenuItem(
+                        child: const Text("Logout"),
+                        onTap: () {
+                          Future.delayed(Duration.zero, () => showLogoutDialog(context));
+                        },
+                      )
+                    ])
           ],
         ),
         body: Padding(
@@ -36,17 +31,43 @@ class NotesPage extends StatelessWidget {
         ));
   }
 
-  Future<Map<String, dynamic>> _getNotes(String token) async {
-    final url = Uri.parse(constants.API_NOTES_CHECK);
-    final response = await http.get(
-      url,
-      headers: {'Authorization': 'Bearer $token'},
-    );
-    if (response.statusCode == 200) {
-      final jsonData = json.decode(response.body);
-      return jsonData;
-    } else {
-      throw Exception('Failed to load notes');
-    }
+  void showLogoutDialog(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text("Sign out"),
+            content: const Text("Are you sure?"),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    AuthService.rest().logOut();
+                    Navigator.of(context)
+                        .pushNamedAndRemoveUntil(loginRoute, (route) => false);
+                  },
+                  child: const Text("Log out")),
+              TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(false);
+                  },
+                  child: const Text("Back"))
+            ],
+          );
+        });
   }
+
+  // Future<Map<String, dynamic>> _getNotes(String token) async {
+  //   final url = Uri.parse(constants.API_NOTES_CHECK);
+  //   final response = await http.get(
+  //     url,
+  //     headers: {'Authorization': 'Bearer $token'},
+  //   );
+  //   if (response.statusCode == 200) {
+  //     final jsonData = json.decode(response.body);
+  //     log('notes response: $jsonData');
+  //     return jsonData;
+  //   } else {
+  //     throw Exception('Failed to load notes');
+  //   }
+  // }
 }
