@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:mynotes/services/auth/authService.dart';
+import 'package:mynotes/services/auth/auth_service.dart';
 
 import '../assets/constants.dart';
 

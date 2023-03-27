@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 abstract class AuthProvider {
   Future<void> initialize();
 
-  Future<String?> getCurrentUserToken();
+  Future<bool> checkIfTokenIsValid();
 
   Future<http.Response> logIn({
     required String username,

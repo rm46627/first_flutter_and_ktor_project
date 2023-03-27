@@ -4,7 +4,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:mynotes/assets/constants.dart' as constants;
 
-import 'authProvider.dart';
+import 'auth_provider.dart';
 
 class RestAuthProvider implements AuthProvider {
   final _storage = const FlutterSecureStorage();
@@ -21,7 +21,8 @@ class RestAuthProvider implements AuthProvider {
   }
 
   Future<void> deleteAuthToken() async {
-    return _storage.delete(key: 'auth_token');
+    await _storage.delete(key: 'auth_token');
+    return;
   }
 
   @override
@@ -45,7 +46,6 @@ class RestAuthProvider implements AuthProvider {
     var body = json.encode(data);
     var response =
         await http.post(uri, headers: {"Content-Type": "application/json"}, body: body);
-    var token = response.body;
     saveAuthToken(response.body);
     return response;
   }
@@ -70,7 +70,13 @@ class RestAuthProvider implements AuthProvider {
   }
 
   @override
-  Future<String?> getCurrentUserToken() {
-    return getAuthToken();
+  Future<bool> checkIfTokenIsValid() async {
+    final url = Uri.parse(constants.API_TOKEN_CHECK);
+    final token = await getAuthToken();
+    final response = await http.get(
+      url,
+      headers: {'Authorization': 'Bearer $token'},
+    );
+    return response.statusCode == 200 ? true : false;
   }
 }

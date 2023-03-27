@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:mynotes/assets/constants.dart';
-import 'package:mynotes/services/auth/authService.dart';
-import 'package:mynotes/views/loginView.dart';
-import 'package:mynotes/views/notesView.dart';
-import 'package:mynotes/views/registerView.dart';
+import 'package:mynotes/services/auth/auth_service.dart';
+import 'package:mynotes/views/login_view.dart';
+import 'package:mynotes/views/notes_view.dart';
+import 'package:mynotes/views/register_view.dart';
 
 void main() {
   runApp(MaterialApp(
-    // debugShowCheckedModeBanner: false,
+    debugShowCheckedModeBanner: false,
     title: 'MyNotesFlutter',
     theme: ThemeData(
       primarySwatch: Colors.blueGrey,
@@ -26,22 +26,18 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<String?>(
-      future: AuthService.rest().getCurrentUserToken(),
-      builder: (BuildContext context, AsyncSnapshot<String?> tokenSnapshot) {
-        if (tokenSnapshot.connectionState != ConnectionState.done) {
+    return FutureBuilder<bool>(
+      future: AuthService.rest().checkIfTokenIsValid(),
+      builder: (BuildContext context, AsyncSnapshot<bool> validSnapshot) {
+        if (validSnapshot.connectionState != ConnectionState.done) {
           return const Scaffold(
             body: Center(
               child: CircularProgressIndicator(),
             ),
           );
         } else {
-          final token = tokenSnapshot.data;
-          if (token == null) {
-            return const LoginView();
-          } else {
-            return const NotesView();
-          }
+          final valid = validSnapshot.data ?? false;
+          return valid == true ? const NotesView() : const LoginView();
         }
       },
     );
