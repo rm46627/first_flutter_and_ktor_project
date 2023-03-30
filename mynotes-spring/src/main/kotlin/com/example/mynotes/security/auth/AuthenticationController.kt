@@ -10,17 +10,13 @@ class AuthenticationController(
     private val service: AuthenticationService
 ){
     @PostMapping("/register")
-    fun register(@RequestBody request: RegisterRequest): HttpEntity<String> {
-        return service.register(request)
-    }
+    fun register(@RequestBody request: RegisterRequest): HttpEntity<out Any> = service.register(request)
 
     @PostMapping("/activate/{code}")
-    fun activate(@RequestBody request: AuthenticationRequest, @PathVariable code: String): HttpEntity<String> {
-        return service.activateAccount(request, code)
-    }
+    fun activate(@RequestBody request: AuthenticationRequest, @PathVariable code: String): HttpEntity<out Any> = service.activateAccount(request, code)
+
 
     @PostMapping("/authenticate")
-    fun authenticate(@RequestBody request: AuthenticationRequest): HttpEntity<String> {
-        return service.authenticate(request)
-    }
+    fun authenticate(@RequestBody request: AuthenticationRequest): HttpEntity<String> = service.authenticate(request)
+
 }

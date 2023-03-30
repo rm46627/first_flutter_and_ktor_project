@@ -8,8 +8,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/api/notes")
 class NotesController {
-
-    @GetMapping
+    @GetMapping("/hello")
     fun sayHello(): ResponseEntity<String> {
         return ResponseEntity.ok("Hello from secured endpoint")
     }

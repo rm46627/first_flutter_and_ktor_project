@@ -10,7 +10,6 @@ import org.springframework.http.HttpEntity
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.ResponseEntity
 import org.springframework.security.authentication.AuthenticationManager
-import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.authentication.DisabledException
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -50,7 +49,7 @@ class AuthenticationService(
                     "Your activation code: $activationCode"
                 )
             )
-            return AuthenticationResponse(jwtService.generateToken(user))
+            return AuthenticationResponse(jwtService.generateToken(user), user.id, user.username, user.email, user.role)
         }
     }
 
@@ -74,7 +73,7 @@ class AuthenticationService(
                 )
             )
             val user = repository.findByUsernameOrEmail(request.usernameOrEmail)!!
-            AuthenticationResponse(jwtService.generateToken(user))
+            AuthenticationResponse(jwtService.generateToken(user), user.id, user.username, user.email, user.role)
         } catch (e: DisabledException) {
             ResponseEntity(HttpStatusCode.valueOf(419))
         }

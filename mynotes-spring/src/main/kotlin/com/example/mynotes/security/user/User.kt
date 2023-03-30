@@ -25,7 +25,7 @@ import org.springframework.security.core.userdetails.UserDetails
 
         override fun getAuthorities(): Collection<GrantedAuthority> = AuthorityUtils.createAuthorityList("USER")
         override fun getPassword(): String = password
-        override fun getUsername(): String = email
+        override fun getUsername(): String = username
         override fun isAccountNonExpired(): Boolean = isAccountNonExpired
         override fun isAccountNonLocked(): Boolean = isAccountNonLocked
         override fun isCredentialsNonExpired(): Boolean = isCredentialsNonExpired
