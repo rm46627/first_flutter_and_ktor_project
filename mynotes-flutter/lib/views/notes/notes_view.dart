@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mynotes/services/auth/auth_service.dart';
 
-import '../assets/constants.dart';
+import '../../assets/constants.dart';
 
 class NotesView extends StatelessWidget {
   const NotesView({super.key});

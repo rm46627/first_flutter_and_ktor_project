@@ -3,11 +3,17 @@ import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:mynotes/assets/constants.dart' as constants;
+import 'package:mynotes/services/auth/AuthenticationResponse.dart';
+import 'package:mynotes/services/auth/user.dart';
 
 import 'auth_provider.dart';
 
 class RestAuthProvider implements AuthProvider {
   final _storage = const FlutterSecureStorage();
+  User? user;
+
+  @override
+  User get currentUser => user ?? const User(id: 0, username: "0", email: "0", role: "0");
 
   @override
   Future<void> initialize() async {}
@@ -46,7 +52,7 @@ class RestAuthProvider implements AuthProvider {
     var body = json.encode(data);
     var response =
         await http.post(uri, headers: {"Content-Type": "application/json"}, body: body);
-    saveAuthToken(response.body);
+    saveUserAndToken(response);
     return response;
   }
 
@@ -65,8 +71,19 @@ class RestAuthProvider implements AuthProvider {
     var body = json.encode(data);
     var response =
         await http.post(uri, headers: {"Content-Type": "application/json"}, body: body);
-    saveAuthToken(response.body);
+    saveUserAndToken(response);
     return response;
+  }
+
+  void saveUserAndToken(http.Response response) {
+    var authResponse =
+        AuthenticationResponse.fromJson(response.body as Map<String, dynamic>);
+    saveAuthToken(authResponse.token);
+    user = User(
+        id: authResponse.userId,
+        username: authResponse.username,
+        email: authResponse.email,
+        role: authResponse.role);
   }
 
   @override

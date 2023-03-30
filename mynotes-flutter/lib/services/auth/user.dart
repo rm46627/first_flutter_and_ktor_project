@@ -2,11 +2,15 @@ import 'package:flutter/foundation.dart';
 
 @immutable
 class User {
-  final String id;
+  final int id;
   final String username;
   final String email;
   final String role;
-  const User({required this.id, required this.username, required this.email, required this.role});
+  const User(
+      {required this.id,
+      required this.username,
+      required this.email,
+      required this.role});
 
   User.fromJson(Map<String, dynamic> json)
       : id = json['id'],
@@ -14,5 +18,6 @@ class User {
         email = json['email'],
         role = json['role'];
 
-  Map<String, dynamic> toJson() => {'id': id, 'username': username, 'email': email, 'role': role};
+  Map<String, dynamic> toJson() =>
+      {'id': id, 'username': username, 'email': email, 'role': role};
 }

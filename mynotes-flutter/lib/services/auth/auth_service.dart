@@ -1,6 +1,7 @@
 import 'package:http/http.dart' as http;
 import 'package:mynotes/services/auth/auth_provider.dart';
 import 'package:mynotes/services/auth/rest_auth_provider.dart';
+import 'package:mynotes/services/auth/user.dart';
 
 class AuthService implements AuthProvider {
   final AuthProvider _provider;
@@ -33,4 +34,7 @@ class AuthService implements AuthProvider {
 
   @override
   Future<bool> checkIfTokenIsValid() => _provider.checkIfTokenIsValid();
+
+  @override
+  User get currentUser => _provider.currentUser;
 }

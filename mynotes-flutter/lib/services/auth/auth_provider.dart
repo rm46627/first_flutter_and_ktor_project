@@ -1,9 +1,12 @@
 import 'package:http/http.dart' as http;
 
+import 'user.dart';
+
 abstract class AuthProvider {
   Future<void> initialize();
 
   Future<bool> checkIfTokenIsValid();
+  User get currentUser;
 
   Future<http.Response> logIn({
     required String username,
