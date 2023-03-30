@@ -5,6 +5,8 @@ import 'package:mynotes/views/login_view.dart';
 import 'package:mynotes/views/notes/notes_view.dart';
 import 'package:mynotes/views/register_view.dart';
 
+import 'assets/service_locator.dart';
+
 void main() {
   serviceLocatorInit();
 

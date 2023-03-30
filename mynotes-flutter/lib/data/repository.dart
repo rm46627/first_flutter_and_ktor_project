@@ -19,8 +19,16 @@ class Repository extends NotesDao {
   List<Note> _notes = [];
   final _notesStreamController = StreamController<List<Note>>.broadcast();
 
+  // on db create cache all notes
+  Future<void> _cacheNotes() async {
+    // final userNotesFromRemote = await _remoteDataSource.getUserNotes(userId);
+    // makeNotesSynced()
+    // _notes = userNotesFromRemote.toList();
+    // _notesStreamController.add(_notes);
+  }
+
   @override
-  Future<void> createNote(String text) async {
+  Future<Note> createNote(String text) async {
     var connectivityResult = await (Connectivity().checkConnectivity());
     if (connectivityResult == ConnectivityResult.mobile ||
         connectivityResult == ConnectivityResult.wifi) {
@@ -28,31 +36,39 @@ class Repository extends NotesDao {
     } else {
       // TODO: notes not synced with remote data source
     }
-
-    await _localDataSource.createNote(text);
-    // _notes.add(note);
-    // _notesStreamController.add(note);
+    final note = await _localDataSource.createNote(text);
+    _notes.add(note);
+    _notesStreamController.add(_notes);
+    return note;
   }
 
   @override
   Future<void> removeNote(Note note) async {
-    return _localDataSource.removeNote(note);
+    // TODO: remove from remote
+
+    // remove from local
+    _localDataSource.removeNote(note);
+    _notes.removeWhere((element) => element.id == note.id);
+    _notesStreamController.add(_notes);
   }
 
   @override
-  Future<List<Note>> selectUserNotes(int userId) async {
-    // get data from local if logged in and connected
-    return _localDataSource.selectUserNotes(AuthService.rest().currentUser.id);
+  Future<List<Note>> selectNotesByUserId(int userId) async {
+    // from local
+    final userNotesFromLocal = await _localDataSource.selectNotesByUserId(userId);
+    _notes = userNotesFromLocal;
+    _notesStreamController.add(userNotesFromLocal);
+    return userNotesFromLocal;
   }
-
-  // Future<void> _cacheNotes() async {
-  //   final allNotes = await selectUserNotes(userId);
-  //   _notes = allNotes.toList();
-  //   _notesStreamController.add(_notes);
-  // }
 
   @override
   Future<void> updateNote(Note note) async {
-    return _localDataSource.updateNote(note);
+    // TODO: update on remote
+
+    // update local
+    _localDataSource.updateNote(note);
+    _notes.removeWhere((element) => element.id == note.id);
+    _notes.add(note);
+    _notesStreamController.add(_notes);
   }
 }
