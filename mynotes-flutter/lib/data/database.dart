@@ -25,6 +25,9 @@ class User extends Table {
 class Database extends _$Database {
   Database() : super(_openConnection());
 
+  static final Database _singleton = Database();
+  factory Database.get() => _singleton;
+
   @override
   int get schemaVersion => 2;
 }

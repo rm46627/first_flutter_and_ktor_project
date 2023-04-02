@@ -11,13 +11,23 @@ class Repository extends NotesDao {
   final LocalDataSource _localDataSource;
   final RemoteDataSource _remoteDataSource;
 
-  Repository(this._localDataSource, this._remoteDataSource);
-  factory Repository.crud() => Repository(LocalDataSource(), RemoteDataSource());
+  Repository(this._localDataSource, this._remoteDataSource) {
+    _notesStreamController = StreamController<List<Note>>.broadcast(onListen: () {
+      _notesStreamController.sink.add(_notes);
+    });
+  }
+
+  // singleton
+  static final Repository _singleton = Repository(LocalDataSource(), RemoteDataSource());
+  factory Repository.get() => _singleton;
+  // factory Repository.crud() => Repository(LocalDataSource(), RemoteDataSource());
 
   final userId = AuthService.rest().currentUser.id;
 
   List<Note> _notes = [];
-  final _notesStreamController = StreamController<List<Note>>.broadcast();
+  late final StreamController<List<Note>> _notesStreamController;
+
+  Stream<List<Note>> get allNotes => _notesStreamController.stream;
 
   // on db create cache all notes
   Future<void> _cacheNotes() async {

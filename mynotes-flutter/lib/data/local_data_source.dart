@@ -1,11 +1,11 @@
 import 'package:mynotes/services/auth/auth_service.dart';
 
-import '../assets/service_locator.dart';
 import 'database.dart';
 import 'notes_dao.dart';
 
 class LocalDataSource extends NotesDao {
-  final database = getIt.get<Database>();
+  // final database = getIt.get<Database>();
+  final database = Database.get();
 
   @override
   Future<Note> createNote(String text) async =>

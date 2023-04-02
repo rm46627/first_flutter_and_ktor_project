@@ -14,10 +14,13 @@ class AuthenticationResponse {
       required this.email,
       required this.role});
 
-  AuthenticationResponse.fromJson(Map<String, dynamic> json)
-      : token = json['token'],
-        userId = json['userId'],
-        username = json['username'],
-        email = json['email'],
-        role = json['role'];
+  factory AuthenticationResponse.fromJson(Map<String, dynamic> json) {
+    return AuthenticationResponse(
+      token: json['token'] as String,
+      userId: json['userId'] as int,
+      username: json['username'] as String,
+      email: json['email'] as String,
+      role: json['role'] as String,
+    );
+  }
 }

@@ -10,8 +10,7 @@ class $UserTable extends User with TableInfo<$UserTable, UserData> {
   $UserTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
-      'id', aliasedName, false,
+  late final GeneratedColumn<int> id = GeneratedColumn<int>('id', aliasedName, false,
       type: DriftSqlType.int,
       requiredDuringInsert: true,
       defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'));
@@ -22,8 +21,7 @@ class $UserTable extends User with TableInfo<$UserTable, UserData> {
       type: DriftSqlType.string,
       requiredDuringInsert: true,
       defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'));
-  static const VerificationMeta _usernameMeta =
-      const VerificationMeta('username');
+  static const VerificationMeta _usernameMeta = const VerificationMeta('username');
   @override
   late final GeneratedColumn<String> username = GeneratedColumn<String>(
       'username', aliasedName, false,
@@ -52,8 +50,7 @@ class $UserTable extends User with TableInfo<$UserTable, UserData> {
       context.missing(_idMeta);
     }
     if (data.containsKey('email')) {
-      context.handle(
-          _emailMeta, email.isAcceptableOrUnknown(data['email']!, _emailMeta));
+      context.handle(_emailMeta, email.isAcceptableOrUnknown(data['email']!, _emailMeta));
     } else if (isInserting) {
       context.missing(_emailMeta);
     }
@@ -64,8 +61,7 @@ class $UserTable extends User with TableInfo<$UserTable, UserData> {
       context.missing(_usernameMeta);
     }
     if (data.containsKey('role')) {
-      context.handle(
-          _roleMeta, role.isAcceptableOrUnknown(data['role']!, _roleMeta));
+      context.handle(_roleMeta, role.isAcceptableOrUnknown(data['role']!, _roleMeta));
     } else if (isInserting) {
       context.missing(_roleMeta);
     }
@@ -124,8 +120,7 @@ class UserData extends DataClass implements Insertable<UserData> {
     );
   }
 
-  factory UserData.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
+  factory UserData.fromJson(Map<String, dynamic> json, {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return UserData(
       id: serializer.fromJson<int>(json['id']),
@@ -145,8 +140,7 @@ class UserData extends DataClass implements Insertable<UserData> {
     };
   }
 
-  UserData copyWith({int? id, String? email, String? username, String? role}) =>
-      UserData(
+  UserData copyWith({int? id, String? email, String? username, String? role}) => UserData(
         id: id ?? this.id,
         email: email ?? this.email,
         username: username ?? this.username,
@@ -270,8 +264,7 @@ class $NotesTable extends Notes with TableInfo<$NotesTable, Note> {
   $NotesTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
-      'id', aliasedName, false,
+  late final GeneratedColumn<int> id = GeneratedColumn<int>('id', aliasedName, false,
       hasAutoIncrement: true,
       type: DriftSqlType.int,
       requiredDuringInsert: false,
@@ -283,16 +276,13 @@ class $NotesTable extends Notes with TableInfo<$NotesTable, Note> {
       'user_id', aliasedName, false,
       type: DriftSqlType.int,
       requiredDuringInsert: true,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('REFERENCES user (id)'));
-  static const VerificationMeta _contentMeta =
-      const VerificationMeta('content');
+      defaultConstraints: GeneratedColumn.constraintIsAlways('REFERENCES user (id)'));
+  static const VerificationMeta _contentMeta = const VerificationMeta('content');
   @override
   late final GeneratedColumn<String> content = GeneratedColumn<String>(
       'content', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _isSyncedMeta =
-      const VerificationMeta('isSynced');
+  static const VerificationMeta _isSyncedMeta = const VerificationMeta('isSynced');
   @override
   late final GeneratedColumn<bool> isSynced =
       GeneratedColumn<bool>('is_synced', aliasedName, false,
@@ -318,14 +308,14 @@ class $NotesTable extends Notes with TableInfo<$NotesTable, Note> {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
     }
     if (data.containsKey('user_id')) {
-      context.handle(_userIdMeta,
-          userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta));
+      context.handle(
+          _userIdMeta, userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta));
     } else if (isInserting) {
       context.missing(_userIdMeta);
     }
     if (data.containsKey('content')) {
-      context.handle(_contentMeta,
-          content.isAcceptableOrUnknown(data['content']!, _contentMeta));
+      context.handle(
+          _contentMeta, content.isAcceptableOrUnknown(data['content']!, _contentMeta));
     } else if (isInserting) {
       context.missing(_contentMeta);
     }
@@ -390,8 +380,7 @@ class Note extends DataClass implements Insertable<Note> {
     );
   }
 
-  factory Note.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
+  factory Note.fromJson(Map<String, dynamic> json, {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return Note(
       id: serializer.fromJson<int>(json['id']),
@@ -411,8 +400,7 @@ class Note extends DataClass implements Insertable<Note> {
     };
   }
 
-  Note copyWith({int? id, int? userId, String? content, bool? isSynced}) =>
-      Note(
+  Note copyWith({int? id, int? userId, String? content, bool? isSynced}) => Note(
         id: id ?? this.id,
         userId: userId ?? this.userId,
         content: content ?? this.content,

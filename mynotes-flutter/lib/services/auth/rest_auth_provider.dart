@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:mynotes/assets/constants.dart' as constants;
-import 'package:mynotes/services/auth/AuthenticationResponse.dart';
+import 'package:mynotes/services/auth/authentication_response.dart';
 import 'package:mynotes/services/auth/user.dart';
 
 import 'auth_provider.dart';
@@ -76,8 +76,11 @@ class RestAuthProvider implements AuthProvider {
   }
 
   void saveUserAndToken(http.Response response) {
-    var authResponse =
-        AuthenticationResponse.fromJson(response.body as Map<String, dynamic>);
+    if (response.body.isEmpty) {
+      throw Exception('Response body is empty');
+    }
+    var authResponse = AuthenticationResponse.fromJson(
+        json.decode(response.body) as Map<String, dynamic>);
     saveAuthToken(authResponse.token);
     user = User(
         id: authResponse.userId,
