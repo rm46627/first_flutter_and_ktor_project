@@ -23,7 +23,7 @@ class AuthenticationService(
     private val authenticationManager: AuthenticationManager,
     private val mailService: MailService
 ) {
-    fun register(request: RegisterRequest): HttpEntity<String> {
+    fun register(request: RegisterRequest): HttpEntity<out Any> {
         val validate = request.email.isBlank() || request.username.isBlank() || request.password.isBlank()
         if(validate) {
             return ResponseEntity(HttpStatusCode.valueOf(403))
@@ -53,7 +53,7 @@ class AuthenticationService(
         }
     }
 
-    fun activateAccount(request: AuthenticationRequest, code: String) : HttpEntity<String> {
+    fun activateAccount(request: AuthenticationRequest, code: String) : HttpEntity<out Any> {
         val user = repository.findByUsernameOrEmail(request.usernameOrEmail) ?: throw NoSuchElementException()
         if(user.code == code) {
             user.setEnabled()
@@ -64,7 +64,7 @@ class AuthenticationService(
         return authenticate(request)
     }
 
-    fun authenticate(request: AuthenticationRequest): HttpEntity<String> {
+    fun authenticate(request: AuthenticationRequest): HttpEntity<out Any> {
         return try {
             authenticationManager.authenticate(
                 UsernamePasswordAuthenticationToken(

@@ -17,6 +17,6 @@ class AuthenticationController(
 
 
     @PostMapping("/authenticate")
-    fun authenticate(@RequestBody request: AuthenticationRequest): HttpEntity<String> = service.authenticate(request)
+    fun authenticate(@RequestBody request: AuthenticationRequest): HttpEntity<out Any> = service.authenticate(request)
 
 }
