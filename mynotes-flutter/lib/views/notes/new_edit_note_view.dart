@@ -1,26 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:mynotes/assets/get_arguments.dart';
 
 import '../../data/database.dart';
 import '../../data/repository.dart';
 
-class NewNoteView extends StatefulWidget {
-  const NewNoteView({Key? key}) : super(key: key);
+class NewEditNoteView extends StatefulWidget {
+  const NewEditNoteView({Key? key}) : super(key: key);
 
   @override
-  State<NewNoteView> createState() => _NewNoteViewState();
+  State<NewEditNoteView> createState() => _NewEditNoteViewState();
 }
 
-class _NewNoteViewState extends State<NewNoteView> {
+class _NewEditNoteViewState extends State<NewEditNoteView> {
   Note? _note;
   late final TextEditingController _textController;
 
-  Future<Note> createNewNote() async {
+  Future<Note> createNewOrGetNote(BuildContext context) async {
+    final widgetNote = context.getArguments<Note>();
+
+    if (widgetNote != null) {
+      _note = widgetNote;
+      _textController.text = widgetNote.content;
+      return widgetNote;
+    }
     final existingNote = _note;
     if (existingNote != null) {
-      // or update existing note
       return existingNote;
     }
-    print("new text: $_textController.value.text");
     _note = await Repository.get().createNote(_textController.value.text);
     return _note!;
   }
@@ -50,20 +56,28 @@ class _NewNoteViewState extends State<NewNoteView> {
 
   @override
   void dispose() {
-    createNewNote();
+    createNewOrGetNote(context);
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: const Text('New note')),
+        appBar: AppBar(
+          title: const Text('New note'),
+          actions: _note != null
+              ? [
+                  IconButton(
+                      onPressed: () => Repository.get().removeNote(_note!),
+                      icon: const Icon(Icons.delete))
+                ]
+              : [],
+        ),
         body: FutureBuilder(
-          future: createNewNote(),
+          future: createNewOrGetNote(context),
           builder: (context, snapshot) {
             switch (snapshot.connectionState) {
               case ConnectionState.done:
-                _note = snapshot.data as Note;
                 _setupTextControllerListener();
                 return TextField(
                   controller: _textController,

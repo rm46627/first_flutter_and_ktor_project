@@ -8,7 +8,7 @@ import 'package:path_provider/path_provider.dart';
 part 'database.g.dart';
 
 class Notes extends Table {
-  IntColumn get id => integer().unique().autoIncrement()();
+  IntColumn get id => integer().autoIncrement()();
   IntColumn get userId => integer().references(User, #id)();
   TextColumn get content => text()();
   BoolColumn get isSynced => boolean()();

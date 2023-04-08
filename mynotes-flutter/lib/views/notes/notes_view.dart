@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:mynotes/services/auth/auth_service.dart';
+import 'package:mynotes/assets/dialogs/logout_dialog.dart';
+import 'package:mynotes/views/notes/notes_list_view.dart';
 
 import '../../assets/constants.dart';
 import '../../data/database.dart';
 import '../../data/repository.dart';
+import '../../services/auth/auth_service.dart';
 
 class NotesView extends StatelessWidget {
   const NotesView({super.key});
@@ -17,11 +19,7 @@ class NotesView extends StatelessWidget {
           PopupMenuButton(
               itemBuilder: (context) => [
                     PopupMenuItem(
-                      child: const Text("Logout"),
-                      onTap: () {
-                        Future.delayed(Duration.zero, () => showLogoutDialog(context));
-                      },
-                    )
+                        child: const Text("Logout"), onTap: () => handleLogout(context))
                   ])
         ],
       ),
@@ -38,19 +36,20 @@ class NotesView extends StatelessWidget {
                       case ConnectionState.active:
                         if (snapshot.hasData) {
                           final notes = snapshot.data as List<Note>;
-                          // print(notes);
-                          return ListView.builder(
-                            itemCount: notes.length,
-                            itemBuilder: (context, index) {
-                              final note = notes[index];
-                              return ListTile(
-                                title: Text(note.content),
-                              );
+                          return NotesListView(
+                            notes: notes.reversed.toList(),
+                            onDeleteNote: (note) async {
+                              await Repository.get().removeNote(note);
+                            },
+                            onTap: (Note note) {
+                              Navigator.of(context)
+                                  .pushNamed(newEditNoteRoute, arguments: note);
                             },
                           );
                         } else {
                           return const CircularProgressIndicator();
                         }
+                        break;
                       default:
                         return const CircularProgressIndicator();
                     }
@@ -61,7 +60,7 @@ class NotesView extends StatelessWidget {
           )),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.of(context).pushNamed(newNoteRoute);
+          Navigator.of(context).pushNamed(newEditNoteRoute);
         },
         backgroundColor: Colors.blueGrey,
         child: const Icon(Icons.add),
@@ -69,28 +68,13 @@ class NotesView extends StatelessWidget {
     );
   }
 
-  void showLogoutDialog(BuildContext context) {
-    showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: const Text("Sign out"),
-            content: const Text("Are you sure?"),
-            actions: [
-              TextButton(
-                  onPressed: () {
-                    AuthService.rest().logOut();
-                    Navigator.of(context)
-                        .pushNamedAndRemoveUntil(loginRoute, (route) => false);
-                  },
-                  child: const Text("Log out")),
-              TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(false);
-                  },
-                  child: const Text("Back"))
-            ],
-          );
-        });
+  void handleLogout(BuildContext context) async {
+    final logoutChoice = await showLogoutDialog(context);
+    if (logoutChoice) {
+      AuthService.rest().logOut();
+      if (context.mounted) {
+        Navigator.of(context).pushNamedAndRemoveUntil(loginRoute, (route) => false);
+      }
+    }
   }
 }
