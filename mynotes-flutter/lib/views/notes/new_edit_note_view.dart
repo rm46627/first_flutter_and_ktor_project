@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mynotes/assets/get_arguments.dart';
 
+import '../../assets/constants.dart';
+import '../../assets/dialogs/delete_dialog.dart';
 import '../../data/database.dart';
 import '../../data/repository.dart';
 
@@ -15,11 +17,17 @@ class _NewEditNoteViewState extends State<NewEditNoteView> {
   Note? _note;
   late final TextEditingController _textController;
 
+  void setNote(Note note) {
+    setState(() {
+      _note = note;
+    });
+  }
+
   Future<Note> createNewOrGetNote(BuildContext context) async {
     final widgetNote = context.getArguments<Note>();
 
     if (widgetNote != null) {
-      _note = widgetNote;
+      setNote(widgetNote);
       _textController.text = widgetNote.content;
       return widgetNote;
     }
@@ -27,8 +35,9 @@ class _NewEditNoteViewState extends State<NewEditNoteView> {
     if (existingNote != null) {
       return existingNote;
     }
-    _note = await Repository.get().createNote(_textController.value.text);
-    return _note!;
+    final newNote = await Repository.get().createNote(_textController.value.text);
+    setNote(newNote);
+    return newNote;
   }
 
   void _setupTextControllerListener() async {
@@ -65,30 +74,45 @@ class _NewEditNoteViewState extends State<NewEditNoteView> {
     return Scaffold(
         appBar: AppBar(
           title: const Text('New note'),
-          actions: _note != null
+          actions: _note == null
               ? [
                   IconButton(
-                      onPressed: () => Repository.get().removeNote(_note!),
-                      icon: const Icon(Icons.delete))
+                    onPressed: () => onDeleteBtnTap(),
+                    icon: const Icon(Icons.delete),
+                  )
                 ]
               : [],
         ),
-        body: FutureBuilder(
-          future: createNewOrGetNote(context),
-          builder: (context, snapshot) {
-            switch (snapshot.connectionState) {
-              case ConnectionState.done:
-                _setupTextControllerListener();
-                return TextField(
-                  controller: _textController,
-                  keyboardType: TextInputType.multiline,
-                  maxLines: null,
-                  decoration: const InputDecoration(hintText: 'Type your note...'),
-                );
-              default:
-                return const CircularProgressIndicator();
-            }
-          },
+        body: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: FutureBuilder(
+            future: createNewOrGetNote(context),
+            builder: (context, snapshot) {
+              switch (snapshot.connectionState) {
+                case ConnectionState.done:
+                  _setupTextControllerListener();
+                  return TextField(
+                    controller: _textController,
+                    keyboardType: TextInputType.multiline,
+                    maxLines: null,
+                    decoration: const InputDecoration(hintText: 'Type your note...'),
+                  );
+                default:
+                  return const CircularProgressIndicator();
+              }
+            },
+          ),
         ));
+  }
+
+  void onDeleteBtnTap() async {
+    final choice = await showDeleteDialog(context);
+    if (choice) {
+      Repository.get().removeNote(_note!);
+      _note = null;
+    }
+    if (context.mounted) {
+      Navigator.of(context).pushNamedAndRemoveUntil(notesRoute, (route) => false);
+    }
   }
 }
