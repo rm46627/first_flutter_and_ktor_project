@@ -22,6 +22,7 @@ class RestAuthProvider implements AuthProvider {
     await _storage.write(key: 'auth_token', value: token);
   }
 
+  @override
   Future<String?> getAuthToken() async {
     return _storage.read(key: 'auth_token');
   }

@@ -37,4 +37,7 @@ class AuthService implements AuthProvider {
 
   @override
   User get currentUser => _provider.currentUser;
+
+  @override
+  Future<String?> getAuthToken() async => _provider.getAuthToken();
 }

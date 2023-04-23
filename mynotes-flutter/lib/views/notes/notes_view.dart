@@ -19,7 +19,26 @@ class NotesView extends StatelessWidget {
           PopupMenuButton(
               itemBuilder: (context) => [
                     PopupMenuItem(
-                        child: const Text("Logout"), onTap: () => handleLogout(context))
+                        child: const Text("Logout"),
+                        onTap: () async {
+                          await Future.delayed(const Duration(milliseconds: 100));
+                          handleLogout(context);
+                        }),
+                    PopupMenuItem(
+                        child: const Text("Sync Notes"),
+                        onTap: () async {
+                          Repository.get().syncNotes();
+                        }),
+                    PopupMenuItem(`
+                        child: const Text("Get notes from remote"),
+                        onTap: () async {
+                          Repository.get().getNotesFromRemote();
+                        }),
+                    PopupMenuItem(
+                        child: const Text("Remove all notes"),
+                        onTap: () async {
+                          Repository.get().removeAllNotes();
+                        }),
                   ])
         ],
       ),

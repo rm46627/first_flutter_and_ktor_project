@@ -1,39 +1,52 @@
-import 'package:mynotes/data/database.dart';
-import 'package:mynotes/data/notes_dao.dart';
+import 'dart:convert';
+import 'dart:developer';
 
-class RemoteDataSource extends NotesDao {
-  @override
-  Future<Note> createNote(String text) {
-    // TODO: implement createNote
-    throw UnimplementedError();
-  }
+import 'package:http/http.dart' as http;
+import 'package:mynotes/assets/constants.dart' as constants;
 
-  @override
-  Future<void> removeNote(Note note) {
-    // TODO: implement removeNote
-    throw UnimplementedError();
-  }
+import '../services/auth/auth_service.dart';
+import 'database.dart';
 
-  @override
+class RemoteDataSource {
   Future<List<Note>> selectNotesByUserId(int userId) async {
-    // final url = Uri.parse(constants.API_NOTES_CHECK);
-    // final response = await http.get(
-    //   url,
-    //   headers: {'Authorization': 'Bearer $token'},
-    // );
-    // if (response.statusCode == 200) {
-    //   final jsonData = json.decode(response.body);
-    //   log('notes response: $jsonData');
-    //   return jsonData;
-    // } else {
-    //   throw Exception('Failed to load notes');
-    // }
-    throw UnimplementedError();
+    final url = Uri.parse(constants.API_GET_NOTES);
+    final token = await AuthService.rest().getAuthToken();
+    final response = await http.get(
+      url,
+      headers: {'Authorization': 'Bearer $token'},
+    );
+    if (response.statusCode == 200) {
+      final jsonData = json.decode(response.body);
+      log('notes response: $jsonData');
+      return jsonData;
+    } else {
+      throw Exception('Failed to load notes');
+    }
   }
 
-  @override
-  Future<void> updateNote(Note note) {
-    // TODO: implement updateNote
-    throw UnimplementedError();
+  Future<void> syncNotes(List<Note> notes) async {
+    final url = Uri.parse(constants.API_SYNC_NOTES);
+    final token = await AuthService.rest().getAuthToken();
+
+    final headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+
+    final jsonNotes = notes.map((note) => note.toJson()).toList();
+    final body = json.encode({
+      'userId': AuthService.rest().currentUser.id,
+      'notes': jsonNotes,
+    });
+
+    print(body);
+
+    final response = await http.post(url, headers: headers, body: body);
+
+    if (response.statusCode == 200) {
+      log('Notes sent successfully!');
+    } else {
+      log('Error sending notes. Status code: ${response.statusCode}');
+    }
   }
 }

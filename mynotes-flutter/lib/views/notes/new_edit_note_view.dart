@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mynotes/assets/get_arguments.dart';
 
-import '../../assets/constants.dart';
 import '../../assets/dialogs/delete_dialog.dart';
 import '../../data/database.dart';
 import '../../data/repository.dart';
@@ -112,7 +111,7 @@ class _NewEditNoteViewState extends State<NewEditNoteView> {
       _note = null;
     }
     if (context.mounted) {
-      Navigator.of(context).pushNamedAndRemoveUntil(notesRoute, (route) => false);
+      Navigator.of(context).pop();
     }
   }
 }

@@ -23,4 +23,25 @@ class LocalDataSource extends NotesDao {
   @override
   Future<void> updateNote(Note note) async =>
       await database.update(database.notes).replace(note);
+
+  @override
+  Future<void> addNotes(List<Note> notes) async {
+    final companions = notes
+        .map((note) => NotesCompanion.insert(
+            content: note.content,
+            userId: AuthService.rest().currentUser.id,
+            isSynced: false))
+        .toList();
+
+    await database.batch((batch) {
+      for (var companion in companions) {
+        batch.insert(database.notes, companion);
+      }
+    });
+  }
+
+  @override
+  Future<void> removeAllNotes() async {
+    await database.delete(database.notes).go();
+  }
 }

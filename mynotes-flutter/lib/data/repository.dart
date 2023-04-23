@@ -29,33 +29,18 @@ class Repository extends NotesDao {
 
   Stream<List<Note>> get allNotes => _notesStreamController.stream;
 
-  // on db create cache all notes
-  Future<void> _cacheNotes() async {
-    // final userNotesFromRemote = await _remoteDataSource.getUserNotes(userId);
-    // makeNotesSynced()
-    // _notes = userNotesFromRemote.toList();
-    // _notesStreamController.add(_notes);
-  }
-
   @override
   Future<Note> createNote(String text) async {
-    var connectivityResult = await (Connectivity().checkConnectivity());
-    if (connectivityResult == ConnectivityResult.mobile ||
-        connectivityResult == ConnectivityResult.wifi) {
-      // TODO: add note to remote data source
-    } else {
-      // TODO: notes not synced with remote data source
-    }
+    // create local note
     final note = await _localDataSource.createNote(text);
     _notes.add(note);
     _notesStreamController.add(_notes);
+
     return note;
   }
 
   @override
   Future<void> removeNote(Note note) async {
-    // TODO: remove from remote
-
     // remove from local
     _localDataSource.removeNote(note);
     _notes.removeWhere((element) => element.id == note.id);
@@ -68,17 +53,44 @@ class Repository extends NotesDao {
     final userNotesFromLocal = await _localDataSource.selectNotesByUserId(userId);
     _notes = userNotesFromLocal;
     _notesStreamController.add(userNotesFromLocal);
+
     return userNotesFromLocal;
   }
 
   @override
   Future<void> updateNote(Note note) async {
-    // TODO: update on remote
-
     // update local
     _localDataSource.updateNote(note);
     _notes.removeWhere((element) => element.id == note.id);
     _notes.add(note);
     _notesStreamController.add(_notes);
   }
+
+  Future<void> syncNotes() async {
+    // sync remote
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.mobile ||
+        connectivityResult == ConnectivityResult.wifi) {
+      final userNotesFromLocal = await _localDataSource.selectNotesByUserId(userId);
+      _remoteDataSource.syncNotes(userNotesFromLocal);
+    }
+  }
+
+  Future<List<Note>> getNotesFromRemote() async {
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    List<Note> notesFromRemote;
+    if (connectivityResult == ConnectivityResult.mobile ||
+        connectivityResult == ConnectivityResult.wifi) {
+      notesFromRemote = await _remoteDataSource.selectNotesByUserId(userId);
+      addNotes(notesFromRemote);
+      return notesFromRemote;
+    }
+    return [];
+  }
+
+  @override
+  Future<void> addNotes(List<Note> notes) => _localDataSource.addNotes(notes);
+
+  @override
+  Future<void> removeAllNotes() => _localDataSource.removeAllNotes();
 }

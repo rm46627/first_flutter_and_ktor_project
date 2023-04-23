@@ -9,7 +9,8 @@ const String API_LOGIN_URL = "$host/api/auth/authenticate";
 const String API_ACTIVATE_URL = "$host/api/auth/activate/";
 const String API_TOKEN_CHECK = '$host/api/notes/hello';
 
-const String API_GET_NOTES = '$host/api/notes';
+const String API_GET_NOTES = '$host/api/notes/get';
+const String API_SYNC_NOTES = '$host/api/notes/sync';
 
 ////
 // Routes
